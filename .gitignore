@@ -4,6 +4,7 @@
 model/
 log/
 input/
+input/.DS_Store
 notebook/
 submission/
 dist/
