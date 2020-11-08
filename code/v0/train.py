@@ -11,6 +11,9 @@ import torch.optim as optim
 
 from utils import *
 from data import *
+from transform import get_transform
+from model import get_model
+from learner import Learner
 
 warnings.filterwarnings("ignore")
 
@@ -36,6 +39,7 @@ class CFG:
     num_targets = 1
     debug = False
     n_folds = 5
+    val_fold = 0
 
 
 def main():
@@ -58,8 +62,8 @@ def main():
     # image
     parser.add_argument('--transform-version', default=0, type=int,
                         help="image transform version ex) 0, 1, 2 ...")
-    parser.add_argument('--image-size', default=256, type=int,
-                        help="image size(256)")
+    parser.add_argument('--image-size', default=64, type=int,
+                        help="image size(64)")
 
     # model
     parser.add_argument('--model-name', default=CFG.model_name,
@@ -83,6 +87,9 @@ def main():
                         help=f"number of workers({CFG.workers})")
     parser.add_argument("--debug", action="store_true",
                         help="debug mode")
+    parser.add_argument("--val-fold", default=CFG.val_fold,
+                        choices=[list(range(0, CFG.n_folds))],
+                        help=f"fold number for validation({CFG.val_fold})")
 
     args = parser.parse_args()
 
@@ -149,9 +156,58 @@ def main():
         open(os.path.join(CFG.log_path, 'CFG.json'), "w"))
     print()
 
+    ### Seed all
+    seed_everything(CFG.seed)
+
     ### Data Related
     # load raw data
+    print("Load Raw Data")
     train_df, test_df, ss_df = load_data(CFG)
+
+    # preprocess data
+    print("Preprocess Data")
+    train_df = preprocess_data(CFG, train_df)
+
+    # split data
+    print("Split Data")
+    train_df, valid_df = split_data(CFG, train_df)
+
+    # get transform
+    print("Get Transforms")
+    train_transforms, test_transforms = get_transform(CFG)
+
+    # get dataset
+    print("Get Dataset")
+    trn_data = DFDDataset(CFG, train_df, train_transforms)
+    val_data = DFDDataset(CFG, valid_df, test_transforms)
+
+    ### Model related
+    # get learner
+    learner = Learner(CFG)
+    learner.name = f"model.fold_{CFG.val_fold}"
+    if CFG.pretrained_path:
+        print("Load Pretrained Model")
+        print(f"... Pretrained Info - {CFG.pretrained_path}")
+        learner.load(CFG.pretrained_path, f"model_state_dict")
+        model = learner.best_model.to(CFG.deivce)
+    else:
+        print(f"Load Model")
+        model = get_model(CFG)
+        model = model.to(CFG.device)
+
+    if torch.cuda.device_count() > 1:
+        model = nn.DataParallel(model)
+
+    # get optimizer
+    optimizer = optim.Adam(model.parameters(), lr=CFG.learning_rate)
+
+    # get scheduler
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='min', patience=2, verbose=False, factor=0.5)
+
+    ### train related
+    # train model
+    learner.train(trn_data, val_data, model, optimizer, scheduler)
 
 
 if __name__ == "__main__":
