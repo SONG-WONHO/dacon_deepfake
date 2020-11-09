@@ -51,7 +51,6 @@ def transform_v1(config):
         OneOf([RandomBrightnessContrast(),
                FancyPCA(),
                HueSaturationValue()], p=0.7),
-        ToGray(p=0.2),
         ShiftScaleRotate(shift_limit=0.1,
                          scale_limit=0.2,
                          rotate_limit=10,
