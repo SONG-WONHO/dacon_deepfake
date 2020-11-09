@@ -4,7 +4,8 @@ from albumentations import (
     Compose, HorizontalFlip, VerticalFlip, Normalize, Cutout, PadIfNeeded,
     RandomCrop, ToFloat, RandomGridShuffle, ChannelShuffle, GridDropout,
     OneOf, RandomRotate90, RandomResizedCrop, Resize, ImageCompression,
-    GaussNoise, GaussianBlur
+    GaussNoise, GaussianBlur, RandomBrightnessContrast, FancyPCA,
+    HueSaturationValue, ToGray, ShiftScaleRotate
 )
 
 
