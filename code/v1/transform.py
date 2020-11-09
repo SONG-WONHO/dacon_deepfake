@@ -45,9 +45,6 @@ def transform_v1(config):
         GaussianBlur(blur_limit=3, p=0.05),
         HorizontalFlip(),
         Resize(config.image_size, config.image_size),
-        PadIfNeeded(min_height=config.image_size,
-                    min_width=config.image_size,
-                    border_mode=cv2.BORDER_CONSTANT),
         OneOf([RandomBrightnessContrast(),
                FancyPCA(),
                HueSaturationValue()], p=0.7),
@@ -56,13 +53,12 @@ def transform_v1(config):
                          rotate_limit=10,
                          border_mode=cv2.BORDER_CONSTANT,
                          p=0.5),
+        ToTensor()
     ])
 
     test_transforms = Compose([
         Resize(config.image_size, config.image_size),
-        PadIfNeeded(min_height=config.image_size,
-                    min_width=config.image_size,
-                    border_mode=cv2.BORDER_CONSTANT),
+        ToTensor()
     ])
 
     return train_transforms, test_transforms
