@@ -64,7 +64,7 @@ def transform_v1(config):
     return train_transforms, test_transforms
 
 def transform_v2(config):
-    train_transforms = albumentations.Compose([
+    train_transforms = Compose([
         HorizontalFlip(p=0.5),
         ImageCompression(quality_lower=99, quality_upper=100),
         ShiftScaleRotate(shift_limit=0.25, scale_limit=0.25,
@@ -77,7 +77,7 @@ def transform_v2(config):
         ToTensor()
     ])
 
-    test_transforms = albumentations.Compose([
+    test_transforms = Compose([
         Resize(config.image_size, config.image_size),
         Normalize(),
         ToTensor()
