@@ -9,7 +9,6 @@ from albumentations import (
 )
 
 
-        w = size
 def transform_v0(config):
     """ default transforms
 
