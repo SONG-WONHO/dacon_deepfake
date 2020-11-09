@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 def load_data(config):
     # train dataframe
     tr_df = []
-    tr_path = os.path.join(config.root_path, "train")
+    tr_path = os.path.join(config.root_path, "train_face")
     for root, dirs, files in os.walk(tr_path):
         if files:
             for file in files:
@@ -29,7 +29,7 @@ def load_data(config):
                                          "image_path"])
 
     # test dataframe
-    te_path = os.path.join(config.root_path, "test", "leaderboard")
+    te_path = os.path.join(config.root_path, "test_face", "leaderboard")
     te_df = [os.path.join(te_path, f) for f in os.listdir(te_path)]
     te_df = pd.DataFrame(te_df, columns=["image_path"])
     te_df['target'] = np.nan
@@ -37,7 +37,7 @@ def load_data(config):
 
     # sample submission
     ss_df = pd.read_csv(
-        os.path.join(config.root_path, "test", "sample_submission.csv"))
+        os.path.join(config.root_path, "test_face", "sample_submission.csv"))
 
     print(f"... Train Shape: {tr_df.shape} Test Shape: {te_df.shape}")
     return tr_df, te_df, ss_df
@@ -100,7 +100,7 @@ def stratified_group_k_fold(X, y, groups, k, seed=None):
 
 
 def split_data(config, df):
-    df['group'] = df['c1'] + "_" + df['c2']
+    df['group'] = df['target'].astype(str) + "_" + df['c2']
     for fold, (tr_idx, vl_idx) in enumerate(stratified_group_k_fold(
                 df, df['target'], df['group'], config.n_folds, config.seed)):
 
@@ -137,7 +137,7 @@ class DFDDataset(Dataset):
 
     def __getitem__(self, idx):
         fn, label = self.df[idx]
-        im = cv2.imread(fn)[:, :, ::-1]
+        im = np.load(fn)
 
         # Apply transformations
         if self.transforms:
