@@ -171,8 +171,7 @@ def main():
     # split data
     print("Split Data")
     train_df, valid_df = split_data(CFG, train_df)
-    train_df = train_df.iloc[:50000]
-    valid_df = valid_df.iloc[:10000]
+    train_df = train_df.sample(10000)
 
     # get transform
     print("Get Transforms")
