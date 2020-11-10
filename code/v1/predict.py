@@ -144,7 +144,7 @@ def main():
         print()
         break
 
-    image_path = [path.replace(".npy", "").replace("./input/test_face/", "")
+    image_path = [path.replace(".npy", "").replace("./input/test_face_margin/", "")
                   for path in test_df['image_path'].values]
     print(final_preds.max(), final_preds.min())
     test_df = pd.DataFrame({"path": image_path, "y": np.round(final_preds)})
