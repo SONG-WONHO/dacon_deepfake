@@ -163,6 +163,7 @@ def main():
     # load raw data
     print("Load Raw Data")
     train_df, test_df, ss_df = load_data(CFG)
+    print(train_df['target'].astype(str) + "_" + train_df['c1'])
     train_df = train_df[
         (train_df['target'].astype(str) + "_" + train_df['c1']).isin(
             ["0_CW", "1_EQ"])].reset_index(drop=True)
