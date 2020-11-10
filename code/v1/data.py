@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 def load_data(config):
     # train dataframe
     tr_df = []
-    tr_path = os.path.join(config.root_path, "train_face")
+    tr_path = os.path.join(config.root_path, "train_face_margin")
     for root, dirs, files in os.walk(tr_path):
         if files:
             for file in files:
@@ -29,7 +29,7 @@ def load_data(config):
                                          "image_path"])
 
     # test dataframe
-    te_path = os.path.join(config.root_path, "test_face", "leaderboard")
+    te_path = os.path.join(config.root_path, "test_face_margin", "leaderboard")
     te_df = [os.path.join(te_path, f) for f in os.listdir(te_path)]
     te_df = pd.DataFrame(te_df, columns=["image_path"])
     te_df['target'] = np.nan
