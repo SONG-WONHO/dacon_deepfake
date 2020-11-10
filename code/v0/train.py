@@ -167,6 +167,7 @@ def main():
     # preprocess data
     print("Preprocess Data")
     train_df = preprocess_data(CFG, train_df)
+    train_df = train_df.iloc[:50000]
 
     # split data
     print("Split Data")
