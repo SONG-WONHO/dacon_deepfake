@@ -63,12 +63,13 @@ def transform_v1(config):
 
     return train_transforms, test_transforms
 
+
 def transform_v2(config):
     train_transforms = Compose([
         HorizontalFlip(p=0.5),
         ImageCompression(quality_lower=99, quality_upper=100),
         ShiftScaleRotate(shift_limit=0.25, scale_limit=0.25,
-                                        rotate_limit=10, border_mode=0, p=0.7),
+                         rotate_limit=10, border_mode=0, p=0.7),
         Resize(config.image_size, config.image_size),
         Cutout(max_h_size=int(config.image_size * 0.6),
                max_w_size=int(config.image_size * 0.6), num_holes=1,
