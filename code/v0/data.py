@@ -19,7 +19,7 @@ def load_data(config):
         if files:
             for file in files:
                 img_path = os.path.join(root, file)
-                item = img_path.split("/")[3:]
+                item = img_path.split("/")[5:]
                 if item[0] == "real":
                     item.insert(4, "None")
                 item.append(img_path)
