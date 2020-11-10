@@ -123,6 +123,9 @@ def split_data(config, df):
                         value_counts(normalize=True)[[0, 1]].
                         round(2).astype(str).values)}""")
 
+    print("... Intersection: ", len(set(train_df['group'].unique()).intersection(
+        valid_df['group'].unique())))
+
     return train_df, valid_df
 
 
