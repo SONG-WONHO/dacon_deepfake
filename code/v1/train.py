@@ -163,7 +163,6 @@ def main():
     # load raw data
     print("Load Raw Data")
     train_df, test_df, ss_df = load_data(CFG)
-            ["0_CW", "1_EQ"])].reset_index(drop=True)
 
     # preprocess data
     print("Preprocess Data")
