@@ -100,7 +100,7 @@ def stratified_group_k_fold(X, y, groups, k, seed=None):
 
 
 def split_data(config, df):
-    df['group'] = df['c1'] + "_" + df['c2']
+    df['group'] = df['target'].astype(str) + "_" + df['c2']
     for fold, (tr_idx, vl_idx) in enumerate(stratified_group_k_fold(
                 df, df['target'], df['group'], config.n_folds, config.seed)):
 
