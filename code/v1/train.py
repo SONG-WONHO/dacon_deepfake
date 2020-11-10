@@ -163,6 +163,9 @@ def main():
     # load raw data
     print("Load Raw Data")
     train_df, test_df, ss_df = load_data(CFG)
+    train_df = train_df[
+        (train_df['target'].astype(str) + "_" + train_df['c1']).isin(
+            ["0_CW", "1_EQ"])]
 
     # preprocess data
     print("Preprocess Data")
@@ -171,6 +174,7 @@ def main():
     # split data
     print("Split Data")
     train_df, valid_df = split_data(CFG, train_df)
+
 
     # get transform
     print("Get Transforms")
