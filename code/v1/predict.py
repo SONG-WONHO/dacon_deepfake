@@ -147,7 +147,7 @@ def main():
     image_path = [path.replace(".npy", "").replace("./input/test_face/", "")
                   for path in test_df['image_path'].values]
     print(final_preds.max(), final_preds.min())
-    test_df = pd.DataFrame({"path": image_path, "y": (final_preds >= 0.5) * 1})
+    test_df = pd.DataFrame({"path": image_path, "y": np.round(final_preds)})
     test_df = test_df.set_index("path")
     ss_df = test_df.loc[ss_df['path']].reset_index()[['path', 'y']]
     ss_df.to_csv(os.path.join(CFG.save_path, f"{CFG.sub_name}"), index=False)
