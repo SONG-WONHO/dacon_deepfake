@@ -172,6 +172,7 @@ def main():
     print("Split Data")
     train_df, valid_df = split_data(CFG, train_df)
     train_df = train_df.sample(10000)
+    valid_df = valid_df.sample(50000)
 
     # get transform
     print("Get Transforms")
