@@ -167,14 +167,10 @@ def main():
     # preprocess data
     print("Preprocess Data")
     train_df = preprocess_data(CFG, train_df)
-    train_df = train_df[
-        (train_df['target'].astype(str) + "_" + train_df['c1']).isin(
-            ["1_CW", "0_EQ"])].reset_index(drop=True)
 
     # split data
     print("Split Data")
     train_df, valid_df = split_data(CFG, train_df)
-
 
     # get transform
     print("Get Transforms")
