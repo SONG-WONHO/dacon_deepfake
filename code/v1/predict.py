@@ -151,7 +151,12 @@ def main():
     test_df = test_df.set_index("path")
     ss_df = test_df.loc[ss_df['path']].reset_index()[['path', 'y']]
     ss_df.to_csv(os.path.join(CFG.save_path, f"{CFG.sub_name}"), index=False)
+    print(ss_df.head())
 
+    test_df = pd.DataFrame({"path": image_path, "y": final_preds})
+    test_df = test_df.set_index("path")
+    ss_df = test_df.loc[ss_df['path']].reset_index()[['path', 'y']]
+    ss_df.to_csv(os.path.join(CFG.save_path, f"raw.{CFG.sub_name}"), index=False)
     print(ss_df.head())
 
 
