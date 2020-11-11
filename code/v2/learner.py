@@ -72,14 +72,15 @@ class Learner(object):
                 train_loader, model, optimizer, scheduler, attack)
 
             # validate one epoch
-            vl_loss, vl_metric = self._valid_one_epoch(
-                valid_loader, model)
+            vl_loss, vl_metric, adv_metric = self._valid_one_epoch(
+                valid_loader, model, attack)
 
             # logging
             logger.loc[epoch] = [
                 np.round(tr_loss, 4),
                 np.round(vl_loss, 4),
                 np.round(vl_metric, 4),
+                np.round(adv_metric, 4),
                 optimizer.param_groups[0]['lr']]
 
             logger.to_csv(os.path.join(
@@ -187,9 +188,9 @@ class Learner(object):
 
         return losses.avg
 
-    def _valid_one_epoch(self, valid_loader, model):
+    def _valid_one_epoch(self, valid_loader, model, attack):
         losses = AverageMeter()
-        true_final, pred_final = [], []
+        true_final, pred_final, adv_final = [], [], []
 
         model.eval()
 
@@ -197,16 +198,19 @@ class Learner(object):
         for i, (X_batch, y_batch) in enumerate(valid_loader):
             X_batch = X_batch.to(self.config.device)
             y_batch = y_batch.to(self.config.device).type(torch.float32)
+            X_adv = attack.perturb(X_batch, y_batch, 'mean', False)
 
             batch_size = X_batch.size(0)
 
             with torch.no_grad():
                 preds = model(X_batch)
+                preds_adv = model(X_adv)
                 loss = loss_func(preds.view(-1), y_batch.view(-1))
                 losses.update(loss.item(), batch_size)
 
             true_final.append(y_batch.cpu())
             pred_final.append(preds.detach().cpu())
+            adv_final.append(preds_adv.detach().cpu())
 
             losses.update(loss.item(), batch_size)
 
@@ -215,13 +219,18 @@ class Learner(object):
         true_final = torch.cat(true_final, dim=0)
         pred_final = torch.cat(pred_final, dim=0).view(-1)
         pred_final = torch.sigmoid(pred_final)
+        adv_final = torch.cat(adv_final, dim=0).view(-1)
+        adv_final = torch.sigmoid(adv_final)
 
         vl_score = accuracy_score(
             true_final.cpu().numpy(), np.round(pred_final.cpu().numpy()))
+        adv_score = accuracy_score(
+            true_final.cpu().numpy(), np.round(adv_final.cpu().numpy())
+        )
 
-        return losses.avg, vl_score
+        return losses.avg, vl_score, adv_score
 
     def _create_logger(self):
-        log_cols = ['tr_loss', 'val_loss', 'val_metric', 'lr']
+        log_cols = ['tr_loss', 'val_loss', 'val_metric', 'adv_metric', 'lr']
         return pd.DataFrame(
             index=range(self.config.num_epochs), columns=log_cols)
