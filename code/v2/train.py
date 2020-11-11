@@ -14,6 +14,7 @@ from data import *
 from transform import get_transform
 from model import get_model
 from learner import Learner
+from attack import FastGradientSignUntargeted
 
 warnings.filterwarnings("ignore")
 
@@ -198,6 +199,15 @@ def main():
     if torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
 
+    # get attacker
+    attack = FastGradientSignUntargeted(CFG, model,
+                                        0.0157,
+                                        0.00784,
+                                        min_val=0,
+                                        max_val=1,
+                                        max_iters=10,
+                                        _type="linf")
+
     # get optimizer
     optimizer = optim.Adam(model.parameters(), lr=CFG.learning_rate)
 
@@ -207,7 +217,7 @@ def main():
 
     ### train related
     # train model
-    learner.train(trn_data, val_data, model, optimizer, scheduler)
+    learner.train(trn_data, val_data, model, optimizer, scheduler, attack)
 
 
 if __name__ == "__main__":
