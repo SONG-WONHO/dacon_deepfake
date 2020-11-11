@@ -2,3 +2,6 @@ v0:
     - BASELINE
 v1:
     - Face Extraction
+
+v2:
+    - Adversarial Training
