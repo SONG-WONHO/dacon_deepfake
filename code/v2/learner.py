@@ -170,7 +170,8 @@ class Learner(object):
         for X_batch, y_batch in train_iterator:
             X_batch = X_batch.to(self.config.device)
             y_batch = y_batch.to(self.config.device).type(torch.float32)
-            X_batch = attack.perturb(X_batch, y_batch, 'mean', True)
+            if np.random.random() > 0.5:
+                X_batch = attack.perturb(X_batch, y_batch, 'mean', True)
 
             batch_size = X_batch.size(0)
 
