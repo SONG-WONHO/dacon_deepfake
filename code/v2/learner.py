@@ -46,7 +46,7 @@ class Learner(object):
         self.logger = None
         self.name = "model"
 
-    def train(self, trn_data, val_data, model, optimizer, scheduler):
+    def train(self, trn_data, val_data, model, optimizer, scheduler, attack):
 
         # dataloader
         train_loader = DataLoader(
@@ -69,7 +69,7 @@ class Learner(object):
         for epoch in range(self.config.num_epochs):
             # train one epoch
             tr_loss = self._train_one_epoch(
-                train_loader, model, optimizer, scheduler)
+                train_loader, model, optimizer, scheduler, attack)
 
             # validate one epoch
             vl_loss, vl_metric = self._valid_one_epoch(
@@ -160,7 +160,7 @@ class Learner(object):
         self.best_model = model.to(self.config.device)
         print("... Model Loaded!")
 
-    def _train_one_epoch(self, train_loader, model, optimizer, scheduler):
+    def _train_one_epoch(self, train_loader, model, optimizer, scheduler, attack):
         losses = AverageMeter()
 
         model.train()
@@ -169,6 +169,7 @@ class Learner(object):
         for X_batch, y_batch in train_iterator:
             X_batch = X_batch.to(self.config.device)
             y_batch = y_batch.to(self.config.device).type(torch.float32)
+            X_batch = attack.perturb(X_batch, y_batch, 'mean', True)
 
             batch_size = X_batch.size(0)
 
